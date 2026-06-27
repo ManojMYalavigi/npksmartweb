@@ -34,24 +34,28 @@ ${soilsSummary}
 
 Respond clearly, helpfully, and beautifully format your responses using Markdown (headers, bullet points, and bold text for emphasis).`;
 
-      // Initialize Gemini SDK with correct class name
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash",
-        systemInstruction: advancedSystemInstruction
-      });
+      try {
+        // Initialize Gemini SDK with correct class name
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({
+          model: "gemini-1.5-flash",
+          systemInstruction: advancedSystemInstruction
+        });
 
-      // Format history for Gemini chat
-      const chat = model.startChat({
-        history: (history || []).map(h => ({
-          role: h.role === "user" ? "user" : "model",
-          parts: [{ text: h.text }]
-        }))
-      });
+        // Format history for Gemini chat
+        const chat = model.startChat({
+          history: (history || []).map(h => ({
+            role: h.role === "user" ? "user" : "model",
+            parts: [{ text: h.text }]
+          }))
+        });
 
-      const result = await chat.sendMessage(message);
-      const reply = await result.response.text();
-      return res.json({ success: true, source: "gemini_api", text: reply });
+        const result = await chat.sendMessage(message);
+        const reply = await result.response.text();
+        return res.json({ success: true, source: "gemini_api", text: reply });
+      } catch (geminiError) {
+        console.warn("Gemini API failed or invalid key, falling back to local expert system:", geminiError.message);
+      }
     }
 
     // Advanced Agricultural Expert System local/offline mode
