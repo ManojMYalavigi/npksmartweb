@@ -84,11 +84,13 @@ const staticMandisList = [
   const getBackendUrl = () => {
     if (typeof window !== "undefined") {
       const host = window.location.hostname;
-      if (host !== "localhost" && host !== "127.0.0.1") {
-        return `http://${host}:5000/api`;
+      if (host !== "localhost" && host !== "127.0.0.1" && !host.includes("10.105.95.25")) {
+        // If hosted on a real domain (like Vercel), the API is on the same domain at /api
+        return `/api`;
       }
     }
-    return "http://10.105.95.25:5000/api";
+    // For local development
+    return "http://localhost:5000/api";
   };
   const BACKEND_URL = getBackendUrl();
   

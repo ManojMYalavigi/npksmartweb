@@ -3,13 +3,15 @@
   "version": "1.0.0",
   "description": "Root configuration for Farmverse AI Platform",
   "private": true,
+  "type": "module",
   "scripts": {
     "install:client": "npm install --prefix client --legacy-peer-deps",
     "install:server": "npm install --prefix server --legacy-peer-deps",
     "install-all": "npm run install:client && npm run install:server",
     "dev:client": "npm run dev --prefix client",
     "dev:server": "npm run dev --prefix server",
-    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\""
+    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "build": "npm run build --prefix client"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

@@ -1,0 +1,1 @@
+{`n  "version": 2,`n  "builds": [`n    { "src": "client/package.json", "use": "@vercel/vite" },`n    { "src": "api/index.js", "use": "@vercel/node" }`n  ],`n  "rewrites": [`n    { "source": "/api/(.*)", "destination": "/api/index.js" },`n    { "source": "/(.*)", "destination": "/$1" }`n  ]`n}

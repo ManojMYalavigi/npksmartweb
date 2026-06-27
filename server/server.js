@@ -27,7 +27,11 @@ app.get("/api/weather", getWeather);
 app.get("/api/mandi", getMandiPrices);
 app.post("/api/chat", chatAssistant);
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`[FARMVERSE SERVER] Running on port ${PORT}`);
-});
+// Start Server (Only in non-Vercel environment)
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, () => {
+    console.log(`[FARMVERSE SERVER] Running on port ${PORT}`);
+  });
+}
+
+export default app;
