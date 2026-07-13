@@ -858,7 +858,16 @@ export default function App() {
             <div className="dashboard-grid">
               {/* Live Weather Widget */}
               <div className="glass-panel" style={styles.card}>
-                <h3 style={styles.cardHeader}>{t.secWeatherWidget}</h3>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgba(255, 255, 255, 0.1)", paddingBottom: "12px", marginBottom: "16px" }}>
+                  <h3 style={{ margin: 0, fontSize: "18px", color: "var(--emerald-green)" }}>{t.secWeatherWidget}</h3>
+                  <button 
+                    onClick={handleAutoGPS}
+                    style={styles.gpsBtn}
+                    title="Auto locate coords"
+                  >
+                    <MapPin size={16} /> GPS
+                  </button>
+                </div>
                 {weatherData ? (
                   <div style={styles.weatherBody}>
                     <div style={styles.weatherMain}>
@@ -934,13 +943,6 @@ export default function App() {
             <div className="glass-panel" style={{ ...styles.card, padding: "20px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
                 <h3 style={{ margin: 0 }}>Soil Sensors</h3>
-                <button 
-                  onClick={handleAutoGPS}
-                  style={styles.gpsBtn}
-                  title="Auto locate coords"
-                >
-                  <MapPin size={16} /> GPS
-                </button>
               </div>
 
               {/* Interactive click sensor binding */}
