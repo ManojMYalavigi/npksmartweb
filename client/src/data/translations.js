@@ -50,7 +50,12 @@ export const translations = {
     
     mandiSearch: "Search Commodity / Mandi Market",
     mandiNearby: "Nearest Markets (GPS Calculated)",
-    mandiTrends: "MSP & Global Export Analytics"
+    mandiTrends: "MSP & Global Export Analytics",
+    newsList: [
+      { title: "Govt Announces New MSP for Kharif Crops", category: "Govt Policy" },
+      { title: "Drone Subsidy Scheme Extended for 2026", category: "Subsidy" },
+      { title: "Heavy Rains Predicted in Central India", category: "Alert" }
+    ]
   },
   Hindi: {
     brand: "फार्मवर्स एआई",
@@ -103,7 +108,12 @@ export const translations = {
     
     mandiSearch: "वस्तु / मंडी बाजार खोजें",
     mandiNearby: "निकटतम मंडी (जीपीएस गणना)",
-    mandiTrends: "एमएसपी और निर्यात विश्लेषण"
+    mandiTrends: "एमएसपी और निर्यात विश्लेषण",
+    newsList: [
+      { title: "सरकार ने खरीफ फसलों के लिए नए न्यूनतम समर्थन मूल्य (MSP) की घोषणा की", category: "सरकारी नीति" },
+      { title: "ड्रोन सब्सिडी योजना को 2026 तक बढ़ाया गया", category: "सब्सिडी" },
+      { title: "मध्य भारत में भारी बारिश की भविष्यवाणी", category: "चेतावनी" }
+    ]
   },
   Kannada: {
     brand: "ಫಾರ್ಮ್‌ವರ್ಸ್ ಎಐ",
@@ -154,9 +164,14 @@ export const translations = {
     cardEconomics: "ಹಣಕಾಸು ರಿಟರ್ನ್ಸ್ ಮೌಲ್ಯಮಾಪನ",
     cardCarbon: "ಕಾರ್ಬನ್ ಸೀಕ್ವೆಸ್ಟ್ರೇಶನ್ ರೇಟಿಂಗ್",
     
-    mandiSearch: "ಮಾರುಕट्टೆ / ಮಂಡಿ ಹುಡುಕಿ",
+    mandiSearch: "ಮಾರುಕಟ್ಟೆ / ಮಂಡಿ ಹುಡುಕಿ",
     mandiNearby: "ಹತ್ತಿರದ ಮಂಡಿಗಳು (ಜಿಪಿಎಸ್ ಆಧಾರಿತ)",
-    mandiTrends: "ಬೆಂಬಲ ಬೆಲೆ ಮತ್ತು ರಫ್ತು ವಿಶ್ಲೇಷಣೆ"
+    mandiTrends: "ಬೆಂಬಲ ಬೆಲೆ ಮತ್ತು ರಫ್ತು ವಿಶ್ಲೇಷಣೆ",
+    newsList: [
+      { title: "ಸರ್ಕಾರದಿಂದ ಮುಂಗಾರು ಬೆಳೆಗಳಿಗೆ ಹೊಸ ಬೆಂಬಲ ಬೆಲೆ (MSP) ಘೋಷಣೆ", category: "ಸರ್ಕಾರಿ ನೀತಿ" },
+      { title: "ಡ್ರೋನ್ ಸಹಾಯಧನ ಯೋಜನೆಯನ್ನು 2026 ರವರೆಗೆ ವಿಸ್ತರಿಸಲಾಗಿದೆ", category: "ಸಹಾಯಧನ" },
+      { title: "ಮಧ್ಯ ಭಾರತದಲ್ಲಿ ಭಾರಿ ಮಳೆ ಮುನ್ಸೂಚನೆ", category: "ಎಚ್ಚರಿಕೆ" }
+    ]
   },
   Tamil: {
     brand: "ஃபார்ம்வெர்ஸ் ஏஐ",
@@ -209,7 +224,12 @@ export const translations = {
     
     mandiSearch: "மண்டி சந்தை / பயிரை தேடுக",
     mandiNearby: "அருகிலுள்ள மண்டிகள் (ஜிபிஎஸ் கணக்கீடு)",
-    mandiTrends: "குறைந்தபட்ச ஆதரவு விலை & ஏற்றுமதி போக்கு"
+    mandiTrends: "குறைந்தபட்ச ஆதரவு விலை & ஏற்றுமதி போக்கு",
+    newsList: [
+      { title: "காரீஃப் பயிர்களுக்கான புதிய குறைந்தபட்ச ஆதரவு விலையை (MSP) அரசு அறிவித்துள்ளது", category: "அரசு கொள்கை" },
+      { title: "ட்ரோன் மானியத் திட்டம் 2026 வரை நீட்டிக்கப்பட்டுள்ளது", category: "மானியம்" },
+      { title: "மத்திய இந்தியாவில் பலத்த மழை பெய்யக்கூடும் என கணிப்பு", category: "எச்சரிக்கை" }
+    ]
   },
   Telugu: {
     brand: "ఫార్మ్‌వర్స్ ఎఐ",
@@ -262,7 +282,12 @@ export const translations = {
     
     mandiSearch: "మండి మార్కెట్ / పంటను శోధించండి",
     mandiNearby: "సమీప మార్కెట్లు (జీపీఎస్ లెక్కించినది)",
-    mandiTrends: "మద్దతు ధర & ఎగుమతి విశ్లేషణ"
+    mandiTrends: "మద్దతు ధర & ఎగుమతి విశ్లేషణ",
+    newsList: [
+      { title: "ఖరీఫ్ పంటలకు కొత్త కనీస మద్దతు ధర (MSP) ప్రకటించిన ప్రభుత్వం", category: "ప్రభుత్వ విధానం" },
+      { title: "డ్రోన్ సబ్సిడీ పథకం 2026 వరకు పొడిగింపు", category: "సబ్సిడీ" },
+      { title: "మధ్య భారతదేశంలో భారీ వర్షాలు కురిసే అవకాశం ఉంది", category: "హెచ్చరిక" }
+    ]
   },
   Marathi: {
     brand: "फार्मव्हर्स एआय",
@@ -315,6 +340,11 @@ export const translations = {
     
     mandiSearch: "वस्तू / मंडी शोध घ्या",
     mandiNearby: "जवळची मंडी (जीपीएस आधारित)",
-    mandiTrends: "किमान आधारभूत किंमत आणि निर्यात विश्लेषण"
+    mandiTrends: "किमान आधारभूत किंमत आणि निर्यात विश्लेषण",
+    newsList: [
+      { title: "शासनाकडून खरीप पिकांसाठी नवीन हमीभाव (MSP) जाहीर", category: "शासकीय धोरण" },
+      { title: "ड्रोन सबसिडी योजना २०२६ पर्यंत वाढवली", category: "सबसिडी" },
+      { title: "मध्य भारतात मुसळधार पावसाचा अंदाज", category: "इशारा" }
+    ]
   }
 };

@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import { getPrediction } from "./controllers/prediction.js";
 import { getWeather } from "./controllers/weather.js";
 import { getMandiPrices } from "./controllers/mandi.js";
-import { chatAssistant } from "./controllers/assistant.js";
+import { chatAssistant, translateNews } from "./controllers/assistant.js";
 
 // Load environment variables
 dotenv.config();
@@ -26,6 +26,7 @@ app.post("/api/predict", getPrediction);
 app.get("/api/weather", getWeather);
 app.get("/api/mandi", getMandiPrices);
 app.post("/api/chat", chatAssistant);
+app.post("/api/translate-news", translateNews);
 
 // Start Server (Only in non-Vercel environment)
 if (process.env.NODE_ENV !== "production") {

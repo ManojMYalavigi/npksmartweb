@@ -16,7 +16,8 @@ export default function Farm3D({
   const animatedObjects = useRef({
     windmills: [],
     crops: [],
-    drones: [],
+    clouds: [],
+    stars: null,
     animals: [],
     weatherParticles: null,
     lightningLight: null
@@ -255,15 +256,43 @@ export default function Farm3D({
     }
     scene.add(solarGrid);
 
-    // 6. Drone Patrol
-    const drone = new THREE.Group();
-    drone.position.set(0, 4.5, 0);
-    const droneGeo = new THREE.BoxGeometry(0.5, 0.1, 0.5);
-    const droneMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, metalness: 0.95, roughness: 0.1 }); // metallic black drone
-    const droneMesh = new THREE.Mesh(droneGeo, droneMat);
-    drone.add(droneMesh);
-    scene.add(drone);
-    animatedObjects.current.drones.push(drone);
+    // 6. Realistic Drifting Clouds
+    const cloudsGroup = new THREE.Group();
+    const cloudsList = [];
+    for (let c = 0; c < 4; c++) {
+      const cloud = new THREE.Group();
+      cloud.position.set(
+        (Math.random() - 0.5) * 16,
+        6 + Math.random() * 2,
+        (Math.random() - 0.5) * 16
+      );
+      
+      const numBlobs = 3 + Math.floor(Math.random() * 3);
+      for (let b = 0; b < numBlobs; b++) {
+        const blobGeo = new THREE.DodecahedronGeometry(0.4 + Math.random() * 0.4, 1);
+        const blobMat = new THREE.MeshStandardMaterial({
+          color: 0xffffff,
+          roughness: 0.9,
+          metalness: 0.1,
+          transparent: true,
+          opacity: 0.35,
+          flatShading: true
+        });
+        const blob = new THREE.Mesh(blobGeo, blobMat);
+        blob.position.set(
+          (Math.random() - 0.5) * 1.2,
+          (Math.random() - 0.5) * 0.3,
+          (Math.random() - 0.5) * 1.2
+        );
+        const scaleY = 0.4 + Math.random() * 0.4;
+        blob.scale.set(1.2, scaleY, 1.2);
+        cloud.add(blob);
+      }
+      cloudsGroup.add(cloud);
+      cloudsList.push(cloud);
+    }
+    scene.add(cloudsGroup);
+    animatedObjects.current.clouds = cloudsList;
 
     // 7. Weather Particles (Rain / Snow)
     let weatherCount = 0;
@@ -301,6 +330,26 @@ export default function Farm3D({
       scene.add(pSystem);
       animatedObjects.current.weatherParticles = pSystem;
     }
+
+    // 7.5. Starry Night Sky field (visible at Evening/Night)
+    const starCount = 200;
+    const starGeo = new THREE.BufferGeometry();
+    const starPos = new Float32Array(starCount * 3);
+    for (let i = 0; i < starCount; i++) {
+      starPos[i*3] = (Math.random() - 0.5) * 30;
+      starPos[i*3+1] = 8 + Math.random() * 8;
+      starPos[i*3+2] = (Math.random() - 0.5) * 30;
+    }
+    starGeo.setAttribute("position", new THREE.BufferAttribute(starPos, 3));
+    const starMat = new THREE.PointsMaterial({
+      color: 0xffffff,
+      size: 0.05,
+      transparent: true,
+      opacity: 0.0 // starts invisible, set by timeOfDay hook
+    });
+    const starField = new THREE.Points(starGeo, starMat);
+    scene.add(starField);
+    animatedObjects.current.stars = starField;
 
     // 8. Event listeners
     const handleResize = () => {
@@ -344,12 +393,21 @@ export default function Farm3D({
         c.rotation.z = sway;
       });
 
-      // Patrol Drone floating pathway
-      animatedObjects.current.drones.forEach(d => {
-        d.position.y = 4.0 + Math.sin(elapsed * 2) * 0.25;
-        d.position.x = Math.sin(elapsed * 0.4) * 4;
-        d.position.z = Math.cos(elapsed * 0.4) * 4;
-      });
+      // Drift clouds slowly
+      if (animatedObjects.current.clouds) {
+        animatedObjects.current.clouds.forEach(c => {
+          c.position.x += 0.004;
+          if (c.position.x > 10) {
+            c.position.x = -10;
+            c.position.z = (Math.random() - 0.5) * 16;
+          }
+        });
+      }
+
+      // Animate water ripples
+      if (canalMesh && canalMesh.material) {
+        canalMesh.material.roughness = 0.05 + Math.sin(elapsed * 3.0) * 0.02;
+      }
 
       // Weather animation ticks
       const parts = animatedObjects.current.weatherParticles;
@@ -446,6 +504,14 @@ export default function Farm3D({
       if (timeOfDay === "Morning") dirLight.position.set(-8, 6, -3);
       else if (timeOfDay === "Evening") dirLight.position.set(8, 3, -3);
       else dirLight.position.set(2, 12, 2);
+    }
+
+    // Fade stars in/out depending on time of day
+    if (animatedObjects.current.stars) {
+      let starOpacity = 0.0;
+      if (timeOfDay === "Night") starOpacity = 0.85;
+      else if (timeOfDay === "Evening") starOpacity = 0.45;
+      animatedObjects.current.stars.material.opacity = starOpacity;
     }
   }, [timeOfDay, weather]);
 

@@ -132,7 +132,7 @@ export default function App() {
     return () => document.removeEventListener("click", handleGlobalClick);
   }, []);
 
-  // Fetch Live News
+  // Fetch Live News & translate if not English
   useEffect(() => {
     const fetchNews = async () => {
       try {
@@ -140,30 +140,74 @@ export default function App() {
         const res = await fetch("https://api.rss2json.com/v1/api.json?rss_url=https://www.thehindubusinessline.com/economy/agri-business/feeder/default.rss");
         const data = await res.json();
         if (data && data.items) {
-          setNewsItems(data.items.slice(0, 3));
+          const rawItems = data.items.slice(0, 3);
+          
+          if (language === "English") {
+            setNewsItems(rawItems);
+          } else {
+            // Translate the items via backend Gemini API
+            try {
+              const transRes = await fetch(`${BACKEND_URL}/translate-news`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  items: rawItems.map(item => ({
+                    title: item.title,
+                    categories: item.categories || ["General"]
+                  })),
+                  language
+                })
+              });
+              const transData = await transRes.json();
+              if (transData.success && transData.items) {
+                // Merge translated fields back
+                const translated = rawItems.map((item, idx) => ({
+                  ...item,
+                  title: transData.items[idx]?.title || item.title,
+                  categories: transData.items[idx]?.categories || item.categories
+                }));
+                setNewsItems(translated);
+              } else {
+                throw new Error("Translation failed");
+              }
+            } catch (transErr) {
+              console.warn("Gemini news translation failed, using localized fallbacks:", transErr);
+              useFallbackNews();
+            }
+          }
         } else {
           throw new Error("Invalid format");
         }
       } catch (e) {
         console.warn("Failed to load live news, using fallback", e);
-        setNewsItems([
-          { title: "Govt Announces New MSP for Kharif Crops", categories: ["Govt Policy"], pubDate: new Date().toISOString() },
-          { title: "Drone Subsidy Scheme Extended for 2026", categories: ["Subsidy"], pubDate: new Date(Date.now() - 86400000).toISOString() },
-          { title: "Heavy Rains Predicted in Central India", categories: ["Alert"], pubDate: new Date(Date.now() - 172800000).toISOString() }
-        ]);
+        useFallbackNews();
       }
     };
+
+    const useFallbackNews = () => {
+      const newsList = t.newsList || [
+        { title: "Govt Announces New MSP for Kharif Crops", category: "Govt Policy" },
+        { title: "Drone Subsidy Scheme Extended for 2026", category: "Subsidy" },
+        { title: "Heavy Rains Predicted in Central India", category: "Alert" }
+      ];
+      setNewsItems(newsList.map((item, index) => ({
+        title: item.title,
+        categories: [item.category],
+        pubDate: new Date(Date.now() - index * 86400000).toISOString()
+      })));
+    };
+
     fetchNews();
-  }, [language]);
+  }, [language, t]);
 
   
   // Environment Configurations
   const [timeOfDay, setTimeOfDay] = useState("Afternoon");
   const [weather, setWeather] = useState("Sunny");
   
-  // Geolocation Coordinate State - DEFAULT SET TO KITTUR, BELAGAVI, KARNATAKA
-  const [gpsCoords, setGpsCoords] = useState({ lat: 15.6027, lon: 74.7894 }); 
-  const [locationName, setLocationName] = useState("Kittur, Belagavi, Karnataka");
+  // Geolocation Coordinate State - INITIALIZED TO NULL
+  const [gpsCoords, setGpsCoords] = useState(null); 
+  const [locationName, setLocationName] = useState("Locating...");
   const [resolvedState, setResolvedState] = useState("all");
 
   // Telemetry Inputs (Simplified to exactly N, P, K, pH, Moisture, Rainfall, Soil Type)
@@ -192,23 +236,56 @@ export default function App() {
   const [selectedCityFilter, setSelectedCityFilter] = useState("");
 
   useEffect(() => {
-    if (resolvedState) {
-      setSelectedStateFilter(resolvedState);
+    const setFallbackLocation = () => {
+      setGpsCoords({ lat: 15.6027, lon: 74.7894 });
+      setLocationName("Kittur, Belagavi, Karnataka");
+    };
+
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          setGpsCoords({ lat: latitude, lon: longitude });
+          try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10&addressdetails=1`);
+            const data = await res.json();
+            if (data && data.address) {
+              const city = data.address.city || data.address.town || data.address.village || data.address.county || "";
+              const state = data.address.state || "";
+              const country = data.address.country || "";
+              const locParts = [city, state, country].filter(Boolean);
+              if (locParts.length > 0) {
+                setLocationName(locParts.join(", "));
+              }
+              if (state) {
+                setResolvedState(state);
+              }
+            }
+          } catch (e) {
+            console.warn("Reverse geocoding failed on frontend:", e);
+          }
+        },
+        (error) => {
+          console.warn("Geolocation error:", error.message);
+          setFallbackLocation();
+        },
+        { timeout: 10000 }
+      );
+    } else {
+      setFallbackLocation();
     }
-  }, [resolvedState]);
+  }, []);
 
   // Auto-select first crop of state/city APMC on data load and sync filters
   useEffect(() => {
     if (mandiPrices.length > 0) {
-      const initialState = selectedStateFilter || resolvedState || "Karnataka";
+      const initialState = selectedStateFilter || "all";
       const stateMandis = mandiPrices.filter(m => 
         initialState === "all" || m.state.toLowerCase() === initialState.toLowerCase()
       );
       const stateCities = Array.from(new Set(stateMandis.map(m => m.city))).sort();
       
-      const userCity = locationName.split(",")[0].trim();
-      const matchedCity = stateCities.find(c => c.toLowerCase() === userCity.toLowerCase());
-      const defaultCity = selectedCityFilter || matchedCity || (stateCities.length > 0 ? stateCities[0] : "");
+      const defaultCity = selectedCityFilter || (stateCities.length > 0 ? stateCities[0] : "");
       
       if (!selectedCityFilter) {
         setSelectedCityFilter(defaultCity);
@@ -224,7 +301,7 @@ export default function App() {
         });
       }
     }
-  }, [mandiPrices, resolvedState]);
+  }, [mandiPrices, selectedStateFilter]);
 
   // AI Chat Assistant States
   const [chatInput, setChatInput] = useState("");
@@ -236,11 +313,17 @@ export default function App() {
 
   const t = translations[language] || translations.English;
 
-  // Poll weather and mandi prices based on location parameters
+  // Poll weather based on GPS location parameters only
   useEffect(() => {
-    fetchWeather();
-    fetchMandiPrices();
+    if (gpsCoords) {
+      fetchWeather();
+    }
   }, [gpsCoords]);
+
+  // Fetch mandi prices on mount, independent of GPS coordinates
+  useEffect(() => {
+    fetchMandiPrices();
+  }, []);
 
   // Translate helper utilities
   const getCropName = (cropId, fallbackName) => {
@@ -336,15 +419,12 @@ export default function App() {
   const fetchMandiPrices = async () => {
     try {
       const response = await fetch(
-        `${BACKEND_URL}/mandi?lat=${gpsCoords.lat}&lon=${gpsCoords.lon}&state=all`
+        `${BACKEND_URL}/mandi?state=all`
       );
       const resData = await response.json();
       if (resData.success) {
         setMandiPrices(resData.mandis);
         setMarketTrends(resData.trends);
-        if (resData.locationName) {
-          setLocationName(resData.locationName);
-        }
       }
     } catch (err) {
       console.warn("Express backend offline. Running mandi price generator client-side.");
