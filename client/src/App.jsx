@@ -119,6 +119,7 @@ export default function App() {
   // Page Navigation State
   const [activeTab, setActiveTab] = useState("dashboard");
   const [language, setLanguage] = useState("English");
+  const t = translations[language] || translations.English;
   const [newsItems, setNewsItems] = useState([]);
 
   // Global Click Sound
@@ -311,7 +312,7 @@ export default function App() {
   const [isLoadingChat, setIsLoadingChat] = useState(false);
   const [lastBotResponse, setLastBotResponse] = useState("");
 
-  const t = translations[language] || translations.English;
+
 
   // Poll weather based on GPS location parameters only
   useEffect(() => {
